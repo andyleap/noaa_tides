@@ -1,0 +1,5 @@
+{
+  "name": "NOAA Tides",
+  "render_readme": true,
+  "domains": ["sensor", "camera"]
+}

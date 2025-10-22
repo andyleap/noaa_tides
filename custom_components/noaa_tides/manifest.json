@@ -1,0 +1,12 @@
+{
+  "domain": "noaa_tides",
+  "name": "NOAA Tides",
+  "codeowners": ["@andyleap"],
+  "config_flow": true,
+  "documentation": "https://github.com/andyleap/noaatides",
+  "integration_type": "device",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/andyleap/noaatides/issues",
+  "requirements": ["matplotlib>=3.5.0"],
+  "version": "1.0.0"
+}
