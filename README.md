@@ -18,7 +18,7 @@ A Home Assistant custom integration that provides real-time tide information fro
 1. Open HACS in your Home Assistant instance
 2. Click on "Integrations"
 3. Click the three dots in the top right corner and select "Custom repositories"
-4. Add the repository URL: `https://github.com/andyleap/noaatides`
+4. Add the repository URL: `https://github.com/andyleap/noaa_tides`
 5. Select category: "Integration"
 6. Click "Add"
 7. Search for "NOAA Tides" and install it
@@ -34,13 +34,20 @@ A Home Assistant custom integration that provides real-time tide information fro
 1. Go to Settings → Devices & Services
 2. Click "+ Add Integration"
 3. Search for "NOAA Tides"
-4. Enter your NOAA station ID and a friendly name for the station
+4. Enter your ZIP code
+5. Select the nearest tide station from the list
+6. (Optional) Configure prediction intervals and chart settings
 
-### Finding Your Station ID
+### Station Discovery
 
-Visit [NOAA Tides & Currents](https://tidesandcurrents.noaa.gov/) to find tide stations near you. The station ID is a 7-digit number found on each station's page.
+The integration automatically finds tide stations near you:
+- Enter any US ZIP code
+- Displays the 10 nearest NOAA tide stations
+- Shows distance from your location
+- Indicates which stations have live water level data vs predictions-only
+- Lists station details (name, state, ID)
 
-Example station IDs:
+Example stations that may appear:
 - `8454000` - Providence, RI
 - `8518750` - The Battery, NY
 - `9414290` - San Francisco, CA
