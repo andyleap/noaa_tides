@@ -4,6 +4,9 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: write
+
 jobs:
   release:
     name: Prepare release
@@ -29,7 +32,7 @@ jobs:
           echo "See [CHANGELOG](CHANGELOG.md) for details." >> RELEASE_NOTES.md
 
       - name: Upload release notes
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           body_path: RELEASE_NOTES.md
           files: |
