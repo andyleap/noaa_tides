@@ -5,9 +5,12 @@ A Home Assistant custom integration that provides real-time tide information fro
 ## Features
 
 - **Current Tide Height**: Real-time water level measurements in meters
-- **Tide Trend**: Shows whether the tide is rising, falling, or steady
+- **Tide Trend**: Shows whether the tide is rising, falling, or steady with rate in ft/hr
 - **Next High Tide**: Time and height of the next high tide
 - **Next Low Tide**: Time and height of the next low tide
+- **Beautiful Tide Chart**: SVG chart showing tide predictions with configurable time ranges (6-168 hours)
+- **Custom Prediction Sensors**: Create sensors for any time offset (e.g., "15min", "1h", "-30min" for historical)
+- **Automatic Station Discovery**: Find nearby stations by ZIP code
 - **Device Integration**: Each tide station appears as a device with multiple sensors
 - **HACS Compatible**: Easy installation and updates through HACS
 
@@ -53,6 +56,46 @@ Example stations that may appear:
 - `9414290` - San Francisco, CA
 - `9447130` - Seattle, WA
 
+## Advanced Features
+
+### Tide Chart
+
+The integration provides a beautiful SVG tide chart as an **Image Entity**:
+- **Smooth curves** using cubic spline interpolation
+- **Configurable time ranges**: 6-168 hours of future predictions
+- **Historical data**: 0-168 hours of past tide data
+- **High/Low markers**: Clearly marked on the chart with heights
+- **Current time indicator**: Orange line showing "now"
+- **Timezone-aware**: Uses your Home Assistant configured timezone
+- **Dark theme optimized**: Looks great in any dashboard
+
+**Configuration options:**
+- `Chart Hours`: How many hours ahead to display (default: 24)
+- `Chart History Hours`: How many hours back to display (default: 0)
+
+### Custom Prediction Sensors
+
+Create sensors for tide height at any time offset:
+
+**Examples:**
+- `15min` - Tide height 15 minutes from now
+- `1h` - Tide height in 1 hour
+- `2.5h` - Tide height in 2.5 hours
+- `-30min` - Tide height 30 minutes ago (historical)
+- `-1h` - Tide height 1 hour ago
+- `1d` - Tide height in 1 day
+
+**Supported formats:**
+- Minutes: `15`, `15m`, `15min`, `15mins`, `15minutes`
+- Hours: `1h`, `1hr`, `1hour`, `2.5h`
+- Days: `1d`, `1day`, `2days`
+- Negative values for historical data: `-15min`, `-1h`
+
+Each custom sensor shows:
+- Predicted tide height in meters
+- Exact prediction time
+- Time interval configured
+
 ## Sensors
 
 Each configured tide station creates a device with the following sensors:
@@ -82,18 +125,71 @@ Each configured tide station creates a device with the following sensors:
 
 ## Usage Examples
 
+### Dashboard: Display Tide Chart
+
+Add the tide chart image to your dashboard:
+
+```yaml
+type: picture-entity
+entity: image.noaa_tides_tide_chart
+show_name: true
+show_state: false
+```
+
+Or in a card with sensors:
+
+```yaml
+type: vertical-stack
+cards:
+  - type: picture-entity
+    entity: image.noaa_tides_tide_chart
+    show_name: false
+    show_state: false
+  - type: entities
+    entities:
+      - entity: sensor.noaa_tides_current_tide_height
+      - entity: sensor.noaa_tides_tide_trend
+      - entity: sensor.noaa_tides_next_high_tide
+      - entity: sensor.noaa_tides_next_low_tide
+```
+
 ### Automation: Notify Before High Tide
 
 ```yaml
 automation:
   - alias: "High Tide Alert"
     trigger:
-      - platform: time
-        at: "{{ state_attr('sensor.my_station_next_high_tide', 'timestamp') - timedelta(hours=1) }}"
+      - platform: state
+        entity_id: sensor.noaa_tides_next_high_tide
+    condition:
+      - condition: template
+        value_template: >
+          {{ (as_timestamp(states('sensor.noaa_tides_next_high_tide')) - as_timestamp(now())) < 1800 }}
     action:
       - service: notify.mobile_app
         data:
-          message: "High tide in 1 hour: {{ state_attr('sensor.my_station_next_high_tide', 'height') }}m"
+          title: "High Tide Soon!"
+          message: "High tide in 30 minutes: {{ state_attr('sensor.noaa_tides_next_high_tide', 'height') }}m"
+```
+
+### Automation: Using Custom Prediction Sensors
+
+Alert when tide will be high enough for kayaking in 2 hours:
+
+```yaml
+automation:
+  - alias: "Kayaking Tide Check"
+    trigger:
+      - platform: time_pattern
+        hours: "/1"  # Check every hour
+    condition:
+      - condition: numeric_state
+        entity_id: sensor.noaa_tides_tide_height_2h
+        above: 1.5  # Minimum depth needed
+    action:
+      - service: notify.mobile_app
+        data:
+          message: "Good tide for kayaking in 2 hours!"
 ```
 
 ### Template: Time Until Next High Tide
@@ -105,7 +201,7 @@ sensor:
       time_until_high_tide:
         friendly_name: "Time Until High Tide"
         value_template: >
-          {% set high_tide = states('sensor.my_station_next_high_tide') | as_datetime %}
+          {% set high_tide = states('sensor.noaa_tides_next_high_tide') | as_datetime %}
           {% set diff = high_tide - now() %}
           {{ diff.total_seconds() // 3600 }}h {{ (diff.total_seconds() % 3600) // 60 }}m
 ```
