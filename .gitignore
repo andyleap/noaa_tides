@@ -54,3 +54,17 @@ home-assistant.db
 home-assistant_v2.db
 *.db-shm
 *.db-wal
+
+# Testing
+.ruff_cache/
+.mypy_cache/
+*.cover
+*.log
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# HACS
+hacs.json.bak

@@ -1,0 +1,57 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "NOAA Tide Station Setup",
+        "description": "Connect to real-time tide data from NOAA tide stations across the United States. Enter your zip code to find the nearest monitoring stations.",
+        "data": {
+          "zip_code": "Zip Code"
+        },
+        "data_description": {
+          "zip_code": "5-digit US zip code to search for nearby tide stations"
+        }
+      },
+      "select_station": {
+        "title": "Select Tide Station",
+        "description": "Multiple tide stations were found near your location. Select the station you want to monitor. Distance and station details are shown to help you choose.",
+        "data": {
+          "station": "Tide Station"
+        },
+        "data_description": {
+          "station": "Choose your preferred tide monitoring station"
+        }
+      }
+    },
+    "error": {
+      "invalid_station": "Could not connect to this station. The station may be offline or not responding. Please try another station.",
+      "no_stations": "No tide stations found near this zip code. Please try a different zip code closer to the coast or check your internet connection.",
+      "unknown": "An unexpected error occurred. Please check your internet connection and try again."
+    },
+    "abort": {
+      "already_configured": "This station is already configured. To modify settings, use the Configure option."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Configure Tide Predictions",
+        "description": "Customize your tide monitoring experience with additional prediction sensors and chart settings. Create sensors for specific time intervals (like '15 minutes from now' or '1 hour ago') and control how much historical and future data appears on your tide chart.",
+        "data": {
+          "prediction_intervals": "Prediction Intervals",
+          "chart_hours": "Chart Future Duration (hours)",
+          "chart_history_hours": "Chart Historical Duration (hours)"
+        },
+        "data_description": {
+          "prediction_intervals": "Comma-separated list of time intervals for custom tide height sensors. Supports formats like '15min', '1h', '2d'. Use negative values for historical data (e.g., '-30min' for 30 minutes ago). Leave empty for default sensors only.",
+          "chart_hours": "How many hours of future tide data to display on the chart (6-168 hours). Default is 24 hours.",
+          "chart_history_hours": "How many hours of historical tide data to display on the chart (0-168 hours). Set to 0 to show only future predictions. Default is 0."
+        }
+      }
+    },
+    "error": {
+      "invalid_intervals": "Invalid interval format. Use formats like: 15min, 1h, 2d for future predictions, or -30min, -1h for historical data. Cannot use 0. Separate multiple values with commas.",
+      "invalid_chart_hours": "Chart future duration must be between 6 and 168 hours (1 week). This controls how far into the future the chart displays.",
+      "invalid_chart_history_hours": "Chart historical duration must be between 0 and 168 hours (1 week). Set to 0 to disable historical data on the chart."
+    }
+  }
+}

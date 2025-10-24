@@ -1,0 +1,68 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 0 * * *"  # Daily
+
+jobs:
+  hassfest:
+    name: Hassfest Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Hassfest validation
+        uses: home-assistant/actions/hassfest@master
+
+  hacs:
+    name: HACS Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: HACS validation
+        uses: hacs/action@main
+        with:
+          category: integration
+
+  tests:
+    name: Python Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements_test.txt
+
+      - name: Lint with ruff
+        run: |
+          ruff check custom_components/noaa_tides/
+
+      - name: Check formatting with black
+        run: |
+          black --check custom_components/noaa_tides/
+
+      - name: Type check with mypy
+        run: |
+          mypy custom_components/noaa_tides/
+        continue-on-error: true  # Don't fail on type errors initially
+
+      - name: Run pytest
+        run: |
+          pytest tests/ --cov=custom_components/noaa_tides --cov-report=xml
+        if: hashFiles('tests/**/*.py') != ''
