@@ -3,6 +3,7 @@
   "name": "NOAA Tides",
   "codeowners": ["@andyleap"],
   "config_flow": true,
+  "dependencies": [],
   "documentation": "https://github.com/andyleap/noaatides",
   "integration_type": "device",
   "iot_class": "cloud_polling",
